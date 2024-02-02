@@ -1,0 +1,155 @@
+---
+title: "Homework 2: Probability Models"
+subtitle: "BEE 4850/5850, Fall 2024"
+format:
+    html:        
+        warning: true
+        error: true
+        fig-format: svg
+    pdf:
+        warning: true
+        error: true
+        keep-tex: true
+        fig-format: svg    
+        include-in-header: 
+            text: |
+                \usepackage{fvextra}
+                \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+        include-before-body:
+            text: |
+                \RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+                showspaces = false,
+                showtabs = false,
+                breaksymbolleft={},
+                breaklines
+                % Note: setting commandchars=\\\{\} here will cause an error 
+                }
+    ipynb:
+        warning: true
+        error: true
+jupyter: julia-1.9
+format-links: [pdf]
+freeze: false
+---
+
+::: {.content-visible when-format="ipynb"}
+**Name**:
+
+**ID**:
+:::
+
+::: {.callout-important icon=false}
+### Due Date
+
+Friday, 2/2/24, 9:00pm
+:::
+
+::: {.content-visible unless-format="ipynb"}
+:::{.callout-tip}
+
+To do this assignment in Julia, you can find a Jupyter notebook with an appropriate environment in [the homework's Github repository]({{< var github_org.repo >}}/hw01). Otherwise, you will be responsible for setting up an appropriate package environment in the language of your choosing. Make sure to include your name and NetID on your solution.
+:::
+:::
+
+## Overview
+
+::: {.cell .markdown}
+
+### Instructions
+
+The goal of this homework assignment is to introduce you to simulation-based data analysis. 
+
+* Problem 1 asks you to explore whether a difference between data collected from two groups might be statistically meaningful or the result of noise. This problem repeats the analysis from [Statistics Without The Agonizing Pain](https://www.youtube.com/watch?v=5Dnw46eC-0o) by John Rauser (which is a neat watch!).
+* Problem 2 asks you to evaluate an interview method for finding the level of cheating on a test to determine whether cheating was relatively high or low. This problem was adapted from [Bayesian Methods for Hackers](https://dataorigami.net/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
+* Problem 3 asks you to assess the quality of fit of a normal distribution to realizations from a Galton Board simulation.
+* Problem 4 (**graded only for graduate students**) asks you to simulate outcomes from the *Price Is Right* Showcase game to identify a bidding strategy.
+:::
+
+::: {.cell .markdown}
+
+### Learning Outcomes
+
+
+:::
+
+::: {.cell .markdown}
+### Load Environment
+
+The following code loads the environment and makes sure all needed packages are installed. This should be at the start of most Julia scripts.
+
+:::
+
+```{julia}
+#| output: false
+
+import Pkg
+Pkg.activate(@__DIR__)
+Pkg.instantiate()
+```
+
+::: {.cell .markdown}
+The following packages are included in the environment (to help you find other similar packages in other languages). The code below loads these packages for use in the subsequent notebook (the desired functionality for each package is commented next to the package).
+
+:::
+
+```{julia}
+#| output: false
+
+using Random # random number generation and seed-setting
+using DataFrames # tabular data structure
+using CSVFiles # reads/writes .csv files
+using Distributions # interface to work with probability distributions
+using Plots # plotting library
+using StatsBase # statistical quantities like mean, median, etc
+using StatsPlots # some additional statistical plotting tools
+```
+
+## Problems (Total: 20 Points)
+
+::: {.cell .markdown}
+:::
+
+### Problem 1 (10 points)
+
+::: {.cell .markdown}
+
+:::
+
+## Problem 2
+
+::: {.cell .markdown}
+As of 2010, Cayuga Lake had frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
+
+**In this problem**:
+
+* Assuming that observations began in 1780, develop and fit a probability model for the occurrences of Cayuga Lake freezing using a Bernoulli distribution.
+* Generate 1,000 realizations of Cayuga Lake freezing occurrences from 1780 to 2010 and check the simulations against the occurrance data. 
+* Using your model, calculate the probability of Cayuga Lake freezing at least once in the next 10 years.
+* What do you think about the validity of your model, both in terms of its ability to reproduce historical data and its use to make future projections? Why might you believe or discount it?
+:::
+
+### Problem 4 (10 points)
+
+<span style="color:red;">GRADED FOR 5850 STUDENTS ONLY</span>
+
+Your mastery of the Central Limit Theorem has led you to win your game of Plinko, and it's time for the [Showcases](https://priceisright.fandom.com/wiki/Showcases). This is the final round of an episode of The Price is Right, matching the two big winners from the episode. Each contestant is shown a "showcase" of prizes, which are usually some combination of a trip, a motor vehicle, some furniture, and maybe some other stuff. They then each have to make a bid on the retail price of the showcase. The rules are:
+
+* an overbid is an automatic loss;
+* the contest who gets closest to the retail price wins their showcase;
+* if a contestant gets within $\$250$ of the retail price and is closer than their opponent, they win both showcases.
+
+Thanks to [exhaustive statistics kept by game show fans](http://tpirstats.com/Season51/Stats.htm), in Season 51 of *The Price is Right* showcase values had the following properties: 
+
+* median: $33,0481;
+* lowest-value: $20,432
+* highest-value: $72,409
+
+
+**In this problem**:
+
+* Write down a model which encodes the Showcase rules as a function of the showcase value and your bid. You can assume that your wagering is independent of your opponent.
+* Select and fit a distribution to the above statistics (you have some freedom to pick a distribution, but make sure you justify it).
+* Using 1,000 samples from your price distribution in your model, plot the expected winnings for bids from $20,000 through $72,000. 
+* Find the bid which maximizes your expected winnings. If you were playing *The Price Is Right*, is this the strategy you would adopt, or are there other considerations you would take into account which were not included in this model?
+
+:::
