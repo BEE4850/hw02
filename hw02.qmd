@@ -57,17 +57,23 @@ To do this assignment in Julia, you can find a Jupyter notebook with an appropri
 
 ### Instructions
 
-The goal of this homework assignment is to introduce you to simulation-based data analysis. 
+The goal of this homework assignment is to practice developing and working with probability models for data.
 
-* Problem 1 asks you to explore whether a difference between data collected from two groups might be statistically meaningful or the result of noise. This problem repeats the analysis from [Statistics Without The Agonizing Pain](https://www.youtube.com/watch?v=5Dnw46eC-0o) by John Rauser (which is a neat watch!).
-* Problem 2 asks you to evaluate an interview method for finding the level of cheating on a test to determine whether cheating was relatively high or low. This problem was adapted from [Bayesian Methods for Hackers](https://dataorigami.net/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
-* Problem 3 asks you to assess the quality of fit of a normal distribution to realizations from a Galton Board simulation.
-* Problem 4 (**graded only for graduate students**) asks you to simulate outcomes from the *Price Is Right* Showcase game to identify a bidding strategy.
+* Problem 1 asks you to fit a sea-level rise model using normal residuals and to assess the validity of that assumption.
+* Problem 2 asks you to model the time series of hourly weather-related variability at a tide gauge.
+* Problem 3 asks you to model the occurrences of Cayuga Lake freezing, and is only slightly adapted from Example 4.1 in [Statistical Methods in the Atmospheric Sciences](https://www.sciencedirect.com/book/9780128158234/statistical-methods-in-the-atmospheric-sciences) by Daniel Wilks.
+* Problem 4 (**graded only for graduate students**) asks you to revisit the sea-level model in Problem 1 by including a model-data discrepancy term in the model calibration.
 :::
 
 ::: {.cell .markdown}
 
 ### Learning Outcomes
+
+After completing this assignments, students will be able to:
+
+* develop probability models for data and model residuals under a variety of statistical assumptions;
+* evaluate the appropriateness of those assumptions through the use of qualitative and quantitative evaluations of goodness-of-fit;
+* fit a basic Bayesian model to data.
 
 
 :::
@@ -102,6 +108,7 @@ using Distributions # interface to work with probability distributions
 using Plots # plotting library
 using StatsBase # statistical quantities like mean, median, etc
 using StatsPlots # some additional statistical plotting tools
+using Optim # optimization tools
 ```
 
 ## Problems (Total: 30 Points for 4850; 40 for 5850)
@@ -125,20 +132,7 @@ where $T_0$ is the temperature (in $^\circ C$) where sea-level is in equilibrium
 * How appropriate was the normal i.i.d. probability model for the residuals? Use any needed quantitative or qualitative assessments of goodness of fit to justify your answer. If this was not an appropriate probability model, what would you change?
 :::
 
-## Problem 2
-
-::: {.cell .markdown}
-As of 2010, Cayuga Lake has frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
-
-**In this problem**:
-
-* Assuming that observations began in 1780, develop and fit a probability model for the occurrences of Cayuga Lake freezing using a Bernoulli distribution.
-* Generate 1,000 realizations of Cayuga Lake freezing occurrences from 1780 to 2010 and check the simulations against the occurrance data. 
-* Using your model, calculate the probability of Cayuga Lake freezing at least once in the next 10 years.
-* What do you think about the validity of your model, both in terms of its ability to reproduce historical data and its use to make future projections? Why might you believe or discount it?
-:::
-
-### Problem 3 
+### Problem 2
 
 ::: {.cell .markdown}
 Tide gauge data is complicated to analyze because it is influenced by different harmonic processes (such as the linear cycle). In this problem, we will develop a model for this data using [NOAA data from the Sewell's Point tide gauge](https://tidesandcurrents.noaa.gov/waterlevels.html?id=8638610) outside of Norfolk, VA from `data/norfolk-hourly-surge-2015.csv`. This is hourly data (in m) from 2015 and includes both the observed data (`Verified (m)`) and the tide level predicted by NOAA's sinusoidal model for periodic variability, such as tides and other seasonal cycles (`Predicted (m)`). 
@@ -149,9 +143,31 @@ Tide gauge data is complicated to analyze because it is influenced by different 
 * Use your model to simulate 1,000 realizations of hourly tide gauge observations. What is the distribution of the maximum tide level? How does this compare to the observed value?
 :::
 
+## Problem 3
+
+::: {.cell .markdown}
+As of 2010, Cayuga Lake has frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
+
+**In this problem**:
+
+* Assuming that observations began in 1780, develop a Bayesian model for whether Cayuga Lake will freeze in a given year, using a Bernoulli distribution. What prior distribution did you use, and how did you select it?
+* Find the maximum *a posteriori* estimate using your model.
+* Generate 1,000 realizations of Cayuga Lake freezing occurrences from 1780 to 2010 and check the simulations against the occurrance data. 
+* Using your model, calculate the probability of Cayuga Lake freezing at least once in the next 10 years.
+* What do you think about the validity of your model, both in terms of its ability to reproduce historical data and its use to make future projections? Why might you believe or discount it? What changes might you make (include thoughts about the prior)?
+:::
+
 ### Problem 4 
 
 <span style="color:red;">GRADED FOR 5850 STUDENTS ONLY</span>
 
+For the sea-level model in Problem 1, model the model-data discrepancy using an AR(1) process, with observation error modeled as normally distributed with standard deviation given by the uncertainty column in the data file.
+
+**In this problem**:
+
+* Find the maximum likelihood estimate of the parameters with this discrepancy structure. How does the parameter inference change from the normal i.i.d. estimate in Problem 1?
+* Generate 1,000 traces, plot a comparison of the hindcasts to those from Problem 1, and compare the surprise indices.
+* Determine whether you have accounted for autocorrelation in the residuals appropriately (hint: generate realizations of just the discrepancy series, compute the resulting residuals from the model fit + discrepancy, and look at the distribution of autocorrelation values).
+* Which model specification would you prefer and why?
 
 :::
