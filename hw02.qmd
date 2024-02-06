@@ -41,13 +41,13 @@ freeze: false
 ::: {.callout-important icon=false}
 ### Due Date
 
-Friday, 2/2/24, 9:00pm
+Friday, 2/23/24, 9:00pm
 :::
 
 ::: {.content-visible unless-format="ipynb"}
 :::{.callout-tip}
 
-To do this assignment in Julia, you can find a Jupyter notebook with an appropriate environment in [the homework's Github repository]({{< var github_org.repo >}}/hw01). Otherwise, you will be responsible for setting up an appropriate package environment in the language of your choosing. Make sure to include your name and NetID on your solution.
+To do this assignment in Julia, you can find a Jupyter notebook with an appropriate environment in [the homework's Github repository]({{< var github_org.repo >}}/hw02). Otherwise, you will be responsible for setting up an appropriate package environment in the language of your choosing. Make sure to include your name and NetID on your solution.
 :::
 :::
 
@@ -104,21 +104,31 @@ using StatsBase # statistical quantities like mean, median, etc
 using StatsPlots # some additional statistical plotting tools
 ```
 
-## Problems (Total: 20 Points)
+## Problems (Total: 30 Points for 4850; 40 for 5850)
 
-::: {.cell .markdown}
-:::
-
-### Problem 1 (10 points)
+### Problem 1
 
 ::: {.cell .markdown}
 
+Consider the following sea-level rise model from [Rahmstorf (2007)](https://doi.org/10.1073/pnas.0907765106):
+
+$$\frac{dH(t)}{dt} = \alpha (T(t) - T_0),$$
+where $T_0$ is the temperature (in $^\circ C$) where sea-level is in equilibrium ($dH/dt = 0$), and $\alpha$ is the sea-level rise sensitivity to temperature. Discretizing this equation using the Euler method and using an annual timestep ($\delta t = 1$), we get $$H(t+1) = H(t) + \alpha (T(t) - T_0).$$
+
+
+**In this problem**: 
+
+* Load the data from the `data/` folder
+  * Global mean temperature data from the HadCRUT 5.0.2.0 dataset (<https://hadobs.metoffice.gov.uk/hadcrut5/data/HadCRUT.5.0.2.0/download.html>) can be found in `data/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv`. This data is averaged over the Northern and Southern Hemispheres and over the whole year.
+  * Global mean sea level anomalies (relative to the 1990 mean global sea level) are in `data/CSIRO_Recons_gmsl_yr_2015.csv`, courtesy of CSIRO (<https://www.cmar.csiro.au/sealevel/sl_data_cmar.html>). 
+* Fit the model under the assumption of normal i.i.d. residuals by maximizing the likelihood and report the parameter estimates. Note that you will need another parameter $H_0$ for the initial sea level. What can you conclude about the relationship between global mean temperature increases and global mean sea level rise?
+* How appropriate was the normal i.i.d. probability model for the residuals? Use any needed quantitative or qualitative assessments of goodness of fit to justify your answer. If this was not an appropriate probability model, what would you change?
 :::
 
 ## Problem 2
 
 ::: {.cell .markdown}
-As of 2010, Cayuga Lake had frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
+As of 2010, Cayuga Lake has frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
 
 **In this problem**:
 
@@ -128,28 +138,20 @@ As of 2010, Cayuga Lake had frozen in the following years: 1796, 1816, 1856, 187
 * What do you think about the validity of your model, both in terms of its ability to reproduce historical data and its use to make future projections? Why might you believe or discount it?
 :::
 
-### Problem 4 (10 points)
+### Problem 3 
+
+::: {.cell .markdown}
+Tide gauge data is complicated to analyze because it is influenced by different harmonic processes (such as the linear cycle). In this problem, we will develop a model for this data using [NOAA data from the Sewell's Point tide gauge](https://tidesandcurrents.noaa.gov/waterlevels.html?id=8638610) outside of Norfolk, VA from `data/norfolk-hourly-surge-2015.csv`. This is hourly data (in m) from 2015 and includes both the observed data (`Verified (m)`) and the tide level predicted by NOAA's sinusoidal model for periodic variability, such as tides and other seasonal cycles (`Predicted (m)`). 
+
+**In this problem**:
+* Load the data file. Take the difference between the observations and the sinusoidal predictions to obtain the tide level which could be attributed to weather-related variability (since for one year sea-level rise and other factors are unlikely to matter). Plot this data.
+* Develop an autoregressive model for the weather-related variability in the Norfolk tide gauge. Make sure to include your logic or exploratory analysis used in determining the model specification.
+* Use your model to simulate 1,000 realizations of hourly tide gauge observations. What is the distribution of the maximum tide level? How does this compare to the observed value?
+:::
+
+### Problem 4 
 
 <span style="color:red;">GRADED FOR 5850 STUDENTS ONLY</span>
 
-Your mastery of the Central Limit Theorem has led you to win your game of Plinko, and it's time for the [Showcases](https://priceisright.fandom.com/wiki/Showcases). This is the final round of an episode of The Price is Right, matching the two big winners from the episode. Each contestant is shown a "showcase" of prizes, which are usually some combination of a trip, a motor vehicle, some furniture, and maybe some other stuff. They then each have to make a bid on the retail price of the showcase. The rules are:
-
-* an overbid is an automatic loss;
-* the contest who gets closest to the retail price wins their showcase;
-* if a contestant gets within $\$250$ of the retail price and is closer than their opponent, they win both showcases.
-
-Thanks to [exhaustive statistics kept by game show fans](http://tpirstats.com/Season51/Stats.htm), in Season 51 of *The Price is Right* showcase values had the following properties: 
-
-* median: $33,0481;
-* lowest-value: $20,432
-* highest-value: $72,409
-
-
-**In this problem**:
-
-* Write down a model which encodes the Showcase rules as a function of the showcase value and your bid. You can assume that your wagering is independent of your opponent.
-* Select and fit a distribution to the above statistics (you have some freedom to pick a distribution, but make sure you justify it).
-* Using 1,000 samples from your price distribution in your model, plot the expected winnings for bids from $20,000 through $72,000. 
-* Find the bid which maximizes your expected winnings. If you were playing *The Price Is Right*, is this the strategy you would adopt, or are there other considerations you would take into account which were not included in this model?
 
 :::
