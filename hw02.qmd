@@ -150,7 +150,7 @@ As of 2010, Cayuga Lake has frozen in the following years: 1796, 1816, 1856, 187
 
 **In this problem**:
 
-* Assuming that observations began in 1780, develop a Bayesian model for whether Cayuga Lake will freeze in a given year, using a Bernoulli distribution. What prior distribution did you use, and how did you select it?
+* Assuming that observations began in 1780, write down a Bayesian model for whether Cayuga Lake will freeze in a given year, using a Bernoulli distribution. How did you select what prior to use?
 * Find the maximum *a posteriori* estimate using your model.
 * Generate 1,000 realizations of Cayuga Lake freezing occurrences from 1780 to 2010 and check the simulations against the occurrance data. 
 * Using your model, calculate the probability of Cayuga Lake freezing at least once in the next 10 years.
