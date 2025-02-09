@@ -1,6 +1,6 @@
 ---
 title: "Homework 2: Probability Models"
-subtitle: "BEE 4850/5850, Fall 2024"
+subtitle: "BEE 4850/5850"
 format:
     html:        
         warning: true
@@ -27,7 +27,7 @@ format:
     ipynb:
         warning: true
         error: true
-jupyter: julia-1.9
+engine: julia
 format-links: [pdf]
 freeze: false
 ---
@@ -41,7 +41,7 @@ freeze: false
 ::: {.callout-important icon=false}
 ### Due Date
 
-Friday, 2/23/24, 9:00pm
+Friday, 2/21/24, 9:00pm
 :::
 
 ::: {.content-visible unless-format="ipynb"}
@@ -60,23 +60,11 @@ To do this assignment in Julia, you can find a Jupyter notebook with an appropri
 The goal of this homework assignment is to practice developing and working with probability models for data.
 
 * Problem 1 asks you to fit a sea-level rise model using normal residuals and to assess the validity of that assumption.
-* Problem 2 asks you to model the time series of hourly weather-related variability at a tide gauge.
-* Problem 3 asks you to model the occurrences of Cayuga Lake freezing, and is only slightly adapted from Example 4.1 in [Statistical Methods in the Atmospheric Sciences](https://www.sciencedirect.com/book/9780128158234/statistical-methods-in-the-atmospheric-sciences) by Daniel Wilks.
-* Problem 4 (**graded only for graduate students**) asks you to revisit the sea-level model in Problem 1 by including a model-data discrepancy term in the model calibration.
+* Problem 2 asks you to model the time series of hourly weather-related variability at a tide gauge using an autoregressive model.
+* Problem 3 asks you to use Poisson regression to predict salamander counts based on environmental data.
+* Problem 4 (only required for students in BEE 5850) asks you to look at the impact of the gender of hurricane names on deaths^[Yes, seriously. Ish. Trust me, I know.].
 :::
 
-::: {.cell .markdown}
-
-### Learning Outcomes
-
-After completing this assignments, students will be able to:
-
-* develop probability models for data and model residuals under a variety of statistical assumptions;
-* evaluate the appropriateness of those assumptions through the use of qualitative and quantitative evaluations of goodness-of-fit;
-* fit a basic Bayesian model to data.
-
-
-:::
 
 ::: {.cell .markdown}
 ### Load Environment
@@ -103,7 +91,7 @@ The following packages are included in the environment (to help you find other s
 
 using Random # random number generation and seed-setting
 using DataFrames # tabular data structure
-using CSVFiles # reads/writes .csv files
+using CSV # reads/writes .csv files
 using Distributions # interface to work with probability distributions
 using Plots # plotting library
 using StatsBase # statistical quantities like mean, median, etc
@@ -111,25 +99,43 @@ using StatsPlots # some additional statistical plotting tools
 using Optim # optimization tools
 ```
 
-## Problems (Total: 30 Points for 4850; 40 for 5850)
+## Problems
+
+### Scoring
+
+* Problem 1 is worth 7 points.
+* Problem 2 is worth 6 points.
+* Problem 3 is worth 7 points.
+* Problem 4 is worth 5 points.
 
 ### Problem 1
 
 ::: {.cell .markdown}
 
-Consider the following sea-level rise model from [Rahmstorf (2007)](https://doi.org/10.1073/pnas.0907765106):
+Consider the following sea-level rise model from [Grinsted et al (2010)](https://doi.org/10.1007/s00382-008-0507-2), which models sea-level rise based on a linear relationship between global mean temperature and an "equilibrium" sea level:
 
-$$\frac{dH(t)}{dt} = \alpha (T(t) - T_0),$$
-where $T_0$ is the temperature (in $^\circ C$) where sea-level is in equilibrium ($dH/dt = 0$), and $\alpha$ is the sea-level rise sensitivity to temperature. Discretizing this equation using the Euler method and using an annual timestep ($\delta t = 1$), we get $$H(t+1) = H(t) + \alpha (T(t) - T_0).$$
+$$\begin{align*}
+\frac{dS}{dt} &= \frac{S_\text{eq} - S}{\tau} \\
+S_\text{eq} &= aT + b,
+\end{align*}
+$$
 
+where
+
+- $S(t)$ is the global mean sea level (in mm) at time $t$;
+- $\tau$ is the response time of sea level (in yrs);
+- $S_\text{eq}$ is the equilibrium sea-level (in mm) at temperature $T$ (in $^\circ$C);
+- $a$ is the sensitivity of $S_\text{eq}$ to $T$ (in mm/$^\circ$C);
+- $b$ is the intercept of $S_\text{eq}$, or the $S_\text{eq}$ when $T=0^\circ$C (in mm).
 
 **In this problem**: 
 
-* Load the data from the `data/` folder
-  * Global mean temperature data from the HadCRUT 5.0.2.0 dataset (<https://hadobs.metoffice.gov.uk/hadcrut5/data/HadCRUT.5.0.2.0/download.html>) can be found in `data/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv`. This data is averaged over the Northern and Southern Hemispheres and over the whole year.
-  * Global mean sea level anomalies (relative to the 1990 mean global sea level) are in `data/CSIRO_Recons_gmsl_yr_2015.csv`, courtesy of CSIRO (<https://www.cmar.csiro.au/sealevel/sl_data_cmar.html>). 
-* Fit the model under the assumption of normal i.i.d. residuals by maximizing the likelihood and report the parameter estimates. Note that you will need another parameter $H_0$ for the initial sea level. What can you conclude about the relationship between global mean temperature increases and global mean sea level rise?
-* How appropriate was the normal i.i.d. probability model for the residuals? Use any needed quantitative or qualitative assessments of goodness of fit to justify your answer. If this was not an appropriate probability model, what would you change?
+* Load the data from the `data/` folder and, following Grinsted et al (2010), normalize both datasets to the 1980-1999 mean (subtract that mean from the data).
+  * Global mean temperature data from the HadCRUT 5.0.2.0 dataset (<https://hadobs.metoffice.gov.uk/hadcrut5/data/HadCRUT.5.0.2.0/download.html>) can be found in `data/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv`. This data is averaged over the Northern and Southern Hemispheres and over the whole year. 
+  * Global mean sea level anomalies (relative to the 1990 mean global sea level) are in `data/CSIRO_Recons_gmsl_yr_2015.csv`, courtesy of CSIRO (<https://www.cmar.csiro.au/sealevel/sl_data_cmar.html>). The standard deviation of the estimate is also added for each year.
+* Write a function to simulate global mean sea levels under a set of model parameters after discretizing the equations above with a timestep of $\delta t = 1$ yr. You will need to subset the temperature data to the years where you also have sea-level data.
+* Fit the model under the assumption of Gaussian i.i.d. residuals by maximizing the likelihood and report the parameter estimates. Note that you will need another parameter $S_0$ for the initial sea level. What can you conclude about the relationship between global mean temperature increases and global mean sea level rise rates?
+* How appropriate was the Gaussian i.i.d. probability model for the residuals? Use any needed quantitative or qualitative assessments of goodness of fit to justify your answer. If this was not an appropriate probability model, what would you change?
 :::
 
 ### Problem 2
@@ -138,36 +144,39 @@ where $T_0$ is the temperature (in $^\circ C$) where sea-level is in equilibrium
 Tide gauge data is complicated to analyze because it is influenced by different harmonic processes (such as the linear cycle). In this problem, we will develop a model for this data using [NOAA data from the Sewell's Point tide gauge](https://tidesandcurrents.noaa.gov/waterlevels.html?id=8638610) outside of Norfolk, VA from `data/norfolk-hourly-surge-2015.csv`. This is hourly data (in m) from 2015 and includes both the observed data (`Verified (m)`) and the tide level predicted by NOAA's sinusoidal model for periodic variability, such as tides and other seasonal cycles (`Predicted (m)`). 
 
 **In this problem**:
+
 * Load the data file. Take the difference between the observations and the sinusoidal predictions to obtain the tide level which could be attributed to weather-related variability (since for one year sea-level rise and other factors are unlikely to matter). Plot this data.
-* Develop an autoregressive model for the weather-related variability in the Norfolk tide gauge. Make sure to include your logic or exploratory analysis used in determining the model specification.
-* Use your model to simulate 1,000 realizations of hourly tide gauge observations. What is the distribution of the maximum tide level? How does this compare to the observed value?
+* Develop an autoregressive (AR) model for the weather-related variability in the Norfolk tide gauge. Make sure to include your logic or exploratory analysis used in determining the model specification.
+* Use your model to simulate 1,000 realizations of hourly tide gauge observations by adding simulations from your AR model back to the predicted sinusoidal trend. What is the distribution of the maximum tide level? How does this compare to the observed value?
 :::
 
 ## Problem 3
 
 ::: {.cell .markdown}
-As of 2010, Cayuga Lake has frozen in the following years: 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, and 1979. Based on this data, we would like to project whether Cayuga Lake is likely to freeze again in the next 25 years. 
+
+The file `data/salamanders.csv` contains counts of salamanders from 47 different plots of the same area in California, as well as the percentage of ground cover and age of the forest in the plot. You would like to see if you can use these data to predict the salamander counts with a Poisson regression.
 
 **In this problem**:
 
-* Assuming that observations began in 1780, write down a Bayesian model for whether Cayuga Lake will freeze in a given year, using a Bernoulli distribution. How did you select what prior to use?
-* Find the maximum *a posteriori* estimate using your model.
-* Generate 1,000 realizations of Cayuga Lake freezing occurrences from 1780 to 2010 and check the simulations against the occurrance data. 
-* Using your model, calculate the probability of Cayuga Lake freezing at least once in the next 10 years.
-* What do you think about the validity of your model, both in terms of its ability to reproduce historical data and its use to make future projections? Why might you believe or discount it? What changes might you make (include thoughts about the prior)?
+* Load the data. You may need to standardize the predictors as they are much larger than the counts.
+* Fit a Poisson regression model for salamander counts using the percentage of ground cover.
+* Plot the expected counts and 90% prediction intervals from your model. How well does the model predict the observed counts? In what ways does it do a good or bad job?
+* Can you improve the model by including forest age? Why do you think this helps or does not help with prediction?
 :::
 
 ### Problem 4 
 
+::: {.cell .markdown}
+
 <span style="color:red;">GRADED FOR 5850 STUDENTS ONLY</span>
 
-For the sea-level model in Problem 1, model the model-data discrepancy using an AR(1) process, with observation error modeled as normally distributed with standard deviation given by the uncertainty column in the data file.
+In 2014, [a paper was published in a prestigious journal](https://www.pnas.org/doi/10.1073/pnas.1402786111) which claimed that hurricanes with more feminine names are deadlier than hurricanes with more masculine names because people take warnings about female-named hurricanes less seriously^[This paper has become a bit of a joke among statisticians, but let's take the hypothesis seriously for this problem's sake.]. The file `data/Hurricanes.csv` contains the original data used in this analysis. While we won't replicate the specific analysis in this paper, let's use the data to look at this hypothesis.
 
 **In this problem**:
 
-* Find the maximum likelihood estimate of the parameters with this discrepancy structure. How does the parameter inference change from the normal i.i.d. estimate in Problem 1?
-* Generate 1,000 traces, plot a comparison of the hindcasts to those from Problem 1, and compare the surprise indices.
-* Determine whether you have accounted for autocorrelation in the residuals appropriately (hint: generate realizations of just the discrepancy series, compute the resulting residuals from the model fit + discrepancy, and look at the distribution of autocorrelation values).
-* Which model specification would you prefer and why?
-
+* One might interpret the hypothesis to claim that the impact of the name is strengthened by the the more powerful. A measure of hurricane strength is its minimum pressure (`min_pressure` in the dataset). Fit a model that predicts deaths ('deaths') using the femininity of the name (`femininity`) and minimum pressure (you may need to standardize the pressure).
+* Interpret the results by generating counterfactual simulations for hurricanes with the most feminine and masculine name scores. Plot the expected values and 90% prediction intervals from these two sets of simulations and compare with the observed storm deaths. Where does the model do well or not well? Does the effect size of the gender of the name seem plausible? 
+* Conclude with a summary of your conclusions about the impact of the gender of a hurricane's name on deaths. How might you change the approach in this problem to keep exploring this hypothesis, if at all?
 :::
+
+## References

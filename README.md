@@ -2,17 +2,16 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is the repository for Homework 2 for [BEE 4850](https://viveks.me/simulation-data-analysis), taught at [Cornell University](https://cornell.edu) in Spring 2024 by [Vivek Srikrishnan](https://viveks.me).
+This is the repository for Homework 2 for [BEE 4850](https://viveks.me/simulation-data-analysis), taught at [Cornell University](https://cornell.edu) in Spring 2025 by [Vivek Srikrishnan](https://viveks.me).
 
-If enrolled in the class, a PDF of the completed assignment, **with all cells evaluated if a notebook**, should be submitted to Gradescope *no later* than Friday, February 23, 2024, at 9:00pm. The assignment will be penalized 50% if it is submitted up to 24 hours late.
+If enrolled in the class, a PDF of the completed assignment, **with all cells evaluated if a notebook**, should be submitted to Gradescope *no later* than Friday, February 21, 2025, at 9:00pm. The assignment will be penalized 50% if it is submitted up to 24 hours late.
 
 ## Learning Objectives
 
 After completing this lab, students will be able to:
 
 * develop probability models for data and model residuals under a variety of statistical assumptions;
-* evaluate the appropriateness of those assumptions through the use of qualitative and quantitative evaluations of goodness-of-fit;
-* fit a basic Bayesian model to data.
+* evaluate the appropriateness of those assumptions through the use of qualitative and quantitative evaluations of goodness-of-fit.
 
 ## Repository Overview
 
@@ -29,7 +28,7 @@ The repository consists of the following files:
 
 ## Prerequisites
 
-1. [Install Julia](https://julialang.org/downloads/) before beginning this lab. This notebook was developed with version 1.8.3, but any 1.8.x should work (there could be some issues with other versions, depending on what's changed).
+1. [Install Julia](https://julialang.org/downloads/) before beginning this lab. This notebook was developed with version 1.10.2, but any 1.10.x should work (there could be some issues with other versions, depending on what's changed).
 2. If necessary, [install git](https://happygitwithr.com/install-git.html) and [create a GitHub account](https://github.com). 
 3. [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository). I recommend doing this in a dedicated `BEE4850/` folder, which can also house homework assignment repositories and lecture notes. You can clone directly into the `BEE4850/` folder.   For Windows (or from another graphical interface), just create a `BEE4850` folder, then a `hw` folder inside of that, then clone into that folder. Or to clone into a `BEE4850/hw` folder, from a command prompt:
     ```bash
@@ -48,7 +47,7 @@ The repository consists of the following files:
   - If you installed VS Code, you should be able to just open `hw02.ipynb` and everything should just work. 
   - If you're using a different IDE, Google how to make sure that it is set up to run a Julia notebook.
   - If you want to use `IJulia.jl`, open a Julia prompt. You can do this by:
-    - Using the `Julia-1.8` or equivalent graphical program, type `cd("BEE4850/hw")` or whatever path points to your lab notebook folder;
+    - Using the `Julia-1.10` or equivalent graphical program, type `cd("BEE4850/hw")` or whatever path points to your lab notebook folder;
     - Navigating to your `BEE4850/hw/hw02` folder and typing `julia` to open the prompt.Then:
     
       ```julia
