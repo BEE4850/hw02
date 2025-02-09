@@ -114,10 +114,10 @@ using Optim # optimization tools
 
 Consider the following sea-level rise model from [Grinsted et al (2010)](https://doi.org/10.1007/s00382-008-0507-2), which models sea-level rise based on a linear relationship between global mean temperature and an "equilibrium" sea level:
 
-$$\begin{align*}
+$$\begin{aligned}
 \frac{dS}{dt} &= \frac{S_\text{eq} - S}{\tau} \\
 S_\text{eq} &= aT + b,
-\end{align*}
+\end{aligned}
 $$
 
 where
