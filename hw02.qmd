@@ -41,7 +41,7 @@ freeze: false
 ::: {.callout-important icon=false}
 ### Due Date
 
-Friday, 2/21/24, 9:00pm
+Friday, 2/21/25, 9:00pm
 :::
 
 ::: {.content-visible unless-format="ipynb"}
