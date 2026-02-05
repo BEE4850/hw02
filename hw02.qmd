@@ -29,7 +29,7 @@ format:
         error: true
 engine: julia
 julia:
-    exeflags: ["+1.10.4"]
+    exeflags: ["+1.11.5"]
 format-links: [pdf]
 freeze: false
 ---
@@ -43,7 +43,7 @@ freeze: false
 ::: {.callout-important icon=false}
 ### Due Date
 
-Friday, 2/21/25, 9:00pm
+Friday, 2/20/26, 9:00pm
 :::
 
 ::: {.content-visible unless-format="ipynb"}
@@ -61,10 +61,10 @@ To do this assignment in Julia, you can find a Jupyter notebook with an appropri
 
 The goal of this homework assignment is to practice developing and working with probability models for data.
 
-* Problem 1 asks you to fit a sea-level rise model using normal residuals and to assess the validity of that assumption.
-* Problem 2 asks you to model the time series of hourly weather-related variability at a tide gauge using an autoregressive model.
+* Problem 1 asks you to interpret linear regression results.
+* Problem 2 asks you to fit some linear regressions to Chicago mortality data.
 * Problem 3 asks you to use Poisson regression to predict salamander counts based on environmental data.
-* Problem 4 (only required for students in BEE 5850) asks you to look at the impact of the gender of hurricane names on deaths^[Yes, seriously. Ish. Trust me, I know.].
+* Problem 4 asks you to look at the impact of the gender of hurricane names on deaths^[Yes, seriously. Ish. Trust me, I know.].
 :::
 
 
@@ -103,82 +103,85 @@ using Optim # optimization tools
 
 ## Problems
 
-### Scoring
+### Problem 1 (4 points)
 
-* Problem 1 is worth 7 points.
-* Problem 2 is worth 6 points.
-* Problem 3 is worth 7 points.
-* Problem 4 is worth 5 points.
+Consider a "simple" multiple linear regression model (as in slide 14 in the Feb. 2 lecture, but with two predictors), with $\beta_0 = 10$, $\beta_1 = -6$,$\beta_2 = 4$, and $\sigma^2=1$.
 
-### Problem 1
+#### Problem 1.1
 
-::: {.cell .markdown}
+Write out the equations of the regression model, including any expressing assumptions about the data.
 
-Consider the following sea-level rise model from [Grinsted et al (2010)](https://doi.org/10.1007/s00382-008-0507-2), which models sea-level rise based on a linear relationship between global mean temperature and an "equilibrium" sea level:
+#### Problem 1.2
 
-$$\begin{aligned}
-\frac{dS}{dt} &= \frac{S_\text{eq} - S}{\tau} \\
-S_\text{eq} &= aT + b,
-\end{aligned}
-$$
+You want to predict a new observation $y$ at $x_1 = 2$ and $x_2 = 3$. Can you say what the probability is that $y \geq 12$? If you can, what is it? If not, why not?
 
-where
+#### Problem 1.3
 
-- $S(t)$ is the global mean sea level (in mm) at time $t$;
-- $\tau$ is the response time of sea level (in yrs);
-- $S_\text{eq}$ is the equilibrium sea-level (in mm) at temperature $T$ (in $^\circ$C);
-- $a$ is the sensitivity of $S_\text{eq}$ to $T$ (in mm/$^\circ$C);
-- $b$ is the intercept of $S_\text{eq}$, or the $S_\text{eq}$ when $T=0^\circ$C (in mm).
+After some analysis, you decide that a Gaussian-error linear regression model is appropriate. Write out the equations of this model, including any expressing assumptions about the data.
 
-**In this problem**: 
+#### Problem 1.4
 
-* Load the data from the `data/` folder and, following Grinsted et al (2010), normalize both datasets to the 1980-1999 mean (subtract that mean from the data).
-  * Global mean temperature data from the HadCRUT 5.0.2.0 dataset (<https://hadobs.metoffice.gov.uk/hadcrut5/data/HadCRUT.5.0.2.0/download.html>) can be found in `data/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv`. This data is averaged over the Northern and Southern Hemispheres and over the whole year. 
-  * Global mean sea level anomalies (relative to the 1990 mean global sea level) are in `data/CSIRO_Recons_gmsl_yr_2015.csv`, courtesy of CSIRO (<https://www.cmar.csiro.au/sealevel/sl_data_cmar.html>). The standard deviation of the estimate is also added for each year.
-* Write a function to simulate global mean sea levels under a set of model parameters after discretizing the equations above with a timestep of $\delta t = 1$ yr. You will need to subset the temperature data to the years where you also have sea-level data.
-* Fit the model under the assumption of Gaussian i.i.d. residuals (include both an uncertain model error term and the standard deviation of the observations in the probability model specification) by maximizing the likelihood. Report the parameter estimates. Note that you will need another parameter $S_0$ for the initial sea level. What can you conclude about the relationship between global mean temperature increases and global mean sea level rise rates?
-* How appropriate was the Gaussian i.i.d. probability model for the residuals? Use any needed quantitative or qualitative assessments of goodness of fit to justify your answer. If this was not an appropriate probability model, what would you change?
-:::
+Can you say what the probability is that $y \geq 12$ at $x_1 = 2$ and $x_2 = 3$? If so, what is it, and if not, why not?
 
-### Problem 2
 
-::: {.cell .markdown}
-Tide gauge data is complicated to analyze because it is influenced by different harmonic processes (such as the linear cycle). In this problem, we will develop a model for this data using [NOAA data from the Sewell's Point tide gauge](https://tidesandcurrents.noaa.gov/waterlevels.html?id=8638610) outside of Norfolk, VA from `data/norfolk-hourly-surge-2015.csv`. This is hourly data (in m) from 2015 and includes both the observed data (`Verified (m)`) and the tide level predicted by NOAA's sinusoidal model for periodic variability, such as tides and other seasonal cycles (`Predicted (m)`). 
+### Problem 2 (7 points)
 
-**In this problem**:
+Let's revisit the `chicago` dataset from HW1 (found in `data/chicago.csv`). We will look at the relationship of the potential predictor variables `pm25median` (the median density of smaller pollutant particles), `o3median` (the median concentration of O$_3$), `so2median` (the median concentration of SO$_2$), and `tmpd` (mean daily temperature) with the variable we would like to predict, `death` (the number of non-accidental deaths on that day).
 
-* Load the data file. Take the difference between the observations and the sinusoidal predictions to obtain the tide level which could be attributed to weather-related variability (since for one year sea-level rise and other factors are unlikely to matter). Plot this data.
-* Develop an autoregressive (AR) model for the weather-related variability in the Norfolk tide gauge. Make sure to include your logic or exploratory analysis used in determining the model specification.
-* Use your model to simulate 1,000 realizations of hourly tide gauge observations by adding simulations from your AR model back to the predicted sinusoidal trend. What is the distribution of the maximum tide level? How does this compare to the observed value?
-:::
+#### Problem 2.1
 
-## Problem 3
+Plot each predictor variable against the response variable (make sure to include labels and titles for each plot). Describe what you observe about the bivariate relationships, if one exists (*e.g.* does it look like they exist, are they linear, positive/negative, etc.) Does a linear regression seem appropriate from any of these plots? Which predictor do you think is most appropriate for a linear regression model and why?
 
-::: {.cell .markdown}
+#### Problem 2.2
+
+You decide to focus on the relationship between `tmpd` and `death`. Your classmate suggests that you use a Gaussian-error linear regression model. Based on this suggestion, calculate the regression coefficients and error variance. Explain the interpretation of the coefficients that you obtain **in this specific problem context**. 
+
+#### Problem 2.3
+
+Add your fitted regression line and a 90% prediction interval to your scatterplot of `tmpd` and `death`. Using this and any other diagnostics, do you agree with the Gaussian-error linear model assumption? Why or why not?
+
+
+### Problem 3 (7 points)
 
 The file `data/salamanders.csv` contains counts of salamanders from 47 different plots of the same area in California, as well as the percentage of ground cover and age of the forest in the plot. You would like to see if you can use these data to predict the salamander counts with a Poisson regression.
 
-**In this problem**:
+#### Problem 3.1
 
-* Load the data. You may need to standardize the predictors as they are much larger than the counts.
-* Fit a Poisson regression model for salamander counts using the percentage of ground cover.
-* Plot the expected counts and 90% prediction intervals from your model. How well does the model predict the observed counts? In what ways does it do a good or bad job?
-* Can you improve the model by including forest age? Why do you think this helps or does not help with prediction?
-:::
+Fit a Poisson regression model for salamander counts using the percentage of ground cover as a predictor. You may need to standardize the predictors as they are much larger than the counts, which you can do using the following function (or its equivalent):
 
-### Problem 4 
+```{julia}
+stdz(x) = (x .- mean(x)) / std(x) # <1>
+```
+1. This function makes it convenient to standardize when we fit the models, rather than changing the data itself.
 
-::: {.cell .markdown}
+#### Problem 3.2 
 
-<span style="color:red;">GRADED FOR 5850 STUDENTS ONLY</span>
+Plot the expected counts and 90% prediction intervals from your model (based on 1,000 simulations from the model) along with the data. How well does the model predict the observed counts? In what ways does it do a good or bad job?
 
-In 2014, [a paper was published in a prestigious journal](https://www.pnas.org/doi/10.1073/pnas.1402786111) which claimed that hurricanes with more feminine names are deadlier than hurricanes with more masculine names because people take warnings about female-named hurricanes less seriously^[This paper has become a bit of a joke among statisticians, but let's take the hypothesis seriously for this problem's sake.]. The file `data/Hurricanes.csv` contains the original data used in this analysis. While we won't replicate the specific analysis in this paper, let's use the data to look at this hypothesis.
+#### Problem 3.3
 
-**In this problem**:
+Can you improve the model by including forest age as a predictor? How did you determine whether this helps or does not help with prediction?
 
-* One might interpret the hypothesis to claim that the impact of the name is strengthened by the the more powerful. A measure of hurricane strength is its minimum pressure (`min_pressure` in the dataset). Fit a model that predicts deaths ('deaths') using the femininity of the name (`femininity`) and minimum pressure (you may need to standardize the pressure).
-* Interpret the results by generating counterfactual simulations for hurricanes with the most feminine and masculine name scores. Plot the expected values and 90% prediction intervals from these two sets of simulations and compare with the observed storm deaths. Where does the model do well or not well? Does the effect size of the gender of the name seem plausible? 
-* Conclude with a summary of your conclusions about the impact of the gender of a hurricane's name on deaths. How might you change the approach in this problem to keep exploring this hypothesis, if at all?
-:::
+### Problem 4 (7 points)
+
+
+In 2014, [a paper was published in a prestigious journal](https://www.pnas.org/doi/10.1073/pnas.1402786111) which claimed that hurricanes with more feminine names are deadlier than hurricanes with more masculine names because people take warnings about female-named hurricanes less seriously^[This paper has become a bit of a joke among statisticians, but let's take the hypothesis seriously for this problem's sake.]. The file `data/Hurricanes.csv` contains the original data used in this analysis (note that this dataset excludes Hurricanes Katrina and Audrey because they were "outliers"). While we won't replicate the specific analysis in this paper, let's use the data to look at this hypothesis.
+
+#### Problem 4.1 
+
+One might interpret the hypothesis to claim that the impact of the name is strengthened by the the more powerful. A measure of hurricane strength is its minimum pressure (`min_pressure` in the dataset). Fit a Poisson regression model that predicts deaths (`deaths`) using the gender of the name (`female`) and minimum pressure (you may need to standardize the pressure). We use `female` instead of the continuous measure of the `femininity` of the name as this is highly subjective and has some weird coding (such as "Sandy" being coded as one of the most female names).
+
+#### Problem 4.2
+
+Interpret the results by generating 1,000 counterfactual simulations for hurricanes with male and female names. Plot the expected values and 90% prediction intervals from these two sets of simulations and compare with the observed storm deaths. Where does the model do well or not well? 
+
+#### Problem 4.3
+
+If we take this hypothesis and model seriously, how many lives would have been saved over the data period by naming all of the hurricanes with male names? Does the effect size seem reasonable to you? Draw on qualitative or quantitative assessments to justify your assessment of reasonableness.
+
+#### Problem 4.4
+
+We can now stop taking this hypothesis seriously. To what extent do you think the finding could be an artifact of the dataset (e.g. there is no actual effect, but there are coincidental features of the data that produce the result that female-named storms are more deadly than male-named storms)? Justify this conclusion with specific reference to an exploratory analysis of the data.
+
 
 ## References
