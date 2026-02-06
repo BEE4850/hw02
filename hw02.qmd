@@ -61,8 +61,8 @@ To do this assignment in Julia, you can find a Jupyter notebook with an appropri
 
 The goal of this homework assignment is to practice developing and working with probability models for data.
 
-* Problem 1 asks you to interpret linear regression results.
-* Problem 2 asks you to fit some linear regressions to Chicago mortality data.
+* Problem 1 asks you to fit some linear regressions to Chicago mortality data.
+* Problem 2 asks you to analyze the probability of Cayuga Lake freezing using a logistic regression model.
 * Problem 3 asks you to use Poisson regression to predict salamander counts based on environmental data.
 * Problem 4 asks you to look at the impact of the gender of hurricane names on deaths^[Yes, seriously. Ish. Trust me, I know.].
 :::
@@ -103,51 +103,46 @@ using Optim # optimization tools
 
 ## Problems
 
-### Problem 1 (4 points)
 
-Consider a "simple" multiple linear regression model (as in slide 14 in the Feb. 2 lecture, but with two predictors), with $\beta_0 = 10$, $\beta_1 = -6$,$\beta_2 = 4$, and $\sigma^2=1$.
-
-#### Problem 1.1
-
-Write out the equations of the regression model, including any expressing assumptions about the data.
-
-#### Problem 1.2
-
-You want to predict a new observation $y$ at $x_1 = 2$ and $x_2 = 3$. Can you say what the probability is that $y \geq 12$? If you can, what is it? If not, why not?
-
-#### Problem 1.3
-
-After some analysis, you decide that a Gaussian-error linear regression model is appropriate. Write out the equations of this model, including any expressing assumptions about the data.
-
-#### Problem 1.4
-
-Can you say what the probability is that $y \geq 12$ at $x_1 = 2$ and $x_2 = 3$? If so, what is it, and if not, why not?
-
-
-### Problem 2 (7 points)
+### Problem 1 (6 points)
 
 Let's revisit the `chicago` dataset from HW1 (found in `data/chicago.csv`). We will look at the relationship of the potential predictor variables `pm25median` (the median density of smaller pollutant particles), `o3median` (the median concentration of O$_3$), `so2median` (the median concentration of SO$_2$), and `tmpd` (mean daily temperature) with the variable we would like to predict, `death` (the number of non-accidental deaths on that day).
 
-#### Problem 2.1
+#### Problem 1.1
 
 Plot each predictor variable against the response variable (make sure to include labels and titles for each plot). Describe what you observe about the bivariate relationships, if one exists (*e.g.* does it look like they exist, are they linear, positive/negative, etc.) Does a linear regression seem appropriate from any of these plots? Which predictor do you think is most appropriate for a linear regression model and why?
 
-#### Problem 2.2
+#### Problem 1.2
 
 You decide to focus on the relationship between `tmpd` and `death`. Your classmate suggests that you use a Gaussian-error linear regression model. Based on this suggestion, calculate the regression coefficients and error variance. Explain the interpretation of the coefficients that you obtain **in this specific problem context**. 
 
-#### Problem 2.3
+#### Problem 1.3
 
 Add your fitted regression line and a 90% prediction interval to your scatterplot of `tmpd` and `death`. Using this and any other diagnostics, do you agree with the Gaussian-error linear model assumption? Why or why not?
 
+### Problem 2 (6 points)
 
-### Problem 3 (7 points)
+This problem is adapted from Example 4.1 and 4.2 in Daniel Wilks' *Statistical Methods in the Atmospheric Sciences*. Updating the table in that book, Cayuga Lake has frozen in 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, 1979, and 2015^[Many of these dates, particularly prior to the 20th century, are subject to some debate, and would be different depending on the data source. Nevertheless, let's use this dataset.]. The probability of whether a severe enough cold spell to freeze the lake occurs is related to changes in global mean temperature. The file `data/HadCRUT5.1Analysis_gl.txt` contains estimates of monthly global mean temperature anomalies (relative to the 1961--1990 mean)^[The first row corresponding to a given year is the series of monthly temperature anomaly estimates, the second row is the number of stations; you only need to work with the anomaly rows.]. You would like to build a model to predict the probability that Cayuga Lake freezes based on the winter (DJF) temperature anomaly.
+
+#### Problem 2.1
+
+Write down a logistic regression model for the probability that Cayuga Lake freezes in a given winter. Encode the occurrence of freezing as a 1, and non-freezing as 0. Load the temperature data and fit this model. To simplify the analysis, since we don't always know whether the lake froze in the January starting a year or the December ending a year, let's assume that the years in which the lake froze correspond to the winter starting the year (so the DJF mean corresponding to the freezing in 1884 would include the December from 1883 and the January and February from 1884). You will only be able to use freezing events between 1851 and the present day due to the temperature data. Interpret the coefficients from your model fit **in this specific problem context**.
+
+#### Problem 2.2
+
+Plot the median probability of freezing versus the DFJ temperature anomaly. Add the 90% prediction interval and the historical freezing events to the plot. Does this model seem reasonable? How over or under confident is it? Quantify this using the surprise index, or the difference between the fraction of events which are outside the 90% prediction interval and the expected 90% coverage.
+
+#### Problem 2.3
+
+What winter temperature anomaly would be required for a 10% probability of Cayuga Lake freezing? 5%? 
+
+### Problem 3 (6 points)
 
 The file `data/salamanders.csv` contains counts of salamanders from 47 different plots of the same area in California, as well as the percentage of ground cover and age of the forest in the plot. You would like to see if you can use these data to predict the salamander counts with a Poisson regression.
 
 #### Problem 3.1
 
-Fit a Poisson regression model for salamander counts using the percentage of ground cover as a predictor. You may need to standardize the predictors as they are much larger than the counts, which you can do using the following function (or its equivalent):
+Write down and fit a Poisson regression model for salamander counts using the percentage of ground cover as a predictor. You may need to standardize the predictors as they are much larger than the counts, which you can do using the following function (or its equivalent):
 
 ```{julia}
 stdz(x) = (x .- mean(x)) / std(x) # <1>
