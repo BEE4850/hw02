@@ -93,12 +93,13 @@ The following packages are included in the environment (to help you find other s
 
 using Random # random number generation and seed-setting
 using DataFrames # tabular data structure
-using CSV # reads/writes .csv files
+using CSVFiles # reads/writes .csv files
 using Distributions # interface to work with probability distributions
 using Plots # plotting library
 using StatsBase # statistical quantities like mean, median, etc
 using StatsPlots # some additional statistical plotting tools
 using Optim # optimization tools
+using LaTeXStrings # latex formatting for plot strings
 ```
 
 ## Problems
@@ -122,19 +123,25 @@ Add your fitted regression line and a 90% prediction interval to your scatterplo
 
 ### Problem 2 (6 points)
 
-This problem is adapted from Example 4.1 and 4.2 in Daniel Wilks' *Statistical Methods in the Atmospheric Sciences*. Updating the table in that book, Cayuga Lake has frozen in 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, 1979, and 2015^[Many of these dates, particularly prior to the 20th century, are subject to some debate, and would be different depending on the data source. Nevertheless, let's use this dataset.]. The probability of whether a severe enough cold spell to freeze the lake occurs is related to changes in global mean temperature. The file `data/HadCRUT5.1Analysis_gl.txt` contains estimates of monthly global mean temperature anomalies (relative to the 1961--1990 mean)^[The first row corresponding to a given year is the series of monthly temperature anomaly estimates, the second row is the number of stations; you only need to work with the anomaly rows.]. You would like to build a model to predict the probability that Cayuga Lake freezes based on the winter (DJF) temperature anomaly.
+This problem is adapted from Example 4.1 and 4.2 in Daniel Wilks' *Statistical Methods in the Atmospheric Sciences*. Updating the table in that book, Cayuga Lake has frozen in 1796, 1816, 1856, 1875, 1884, 1904, 1912, 1934, 1961, 1979, and 2015^[Many of these dates, particularly prior to the 20th century, are subject to some debate, and would be different depending on the data source. Nevertheless, let's use this dataset.]. The probability of whether a severe enough cold spell to freeze the lake occurs is related to changes in global mean temperature. The file `data/HadCRUT5.1Analysis_gl.txt` contains estimates of monthly global mean temperature anomalies (in $^\circ$ C, relative to the 1961--1990 mean) as well as the annual global temperature anomaly. You would like to build a model to predict the probability that Cayuga Lake freezes based on the winter (DJF) temperature anomaly.
 
 #### Problem 2.1
 
-Write down a logistic regression model for the probability that Cayuga Lake freezes in a given winter. Encode the occurrence of freezing as a 1, and non-freezing as 0. Load the temperature data and fit this model. To simplify the analysis, since we don't always know whether the lake froze in the January starting a year or the December ending a year, let's assume that the years in which the lake froze correspond to the winter starting the year (so the DJF mean corresponding to the freezing in 1884 would include the December from 1883 and the January and February from 1884). You will only be able to use freezing events between 1851 and the present day due to the temperature data. Interpret the coefficients from your model fit **in this specific problem context**.
+Write down a logistic regression model for the probability that Cayuga Lake freezes in a given winter. Encode the occurrence of freezing as a 1, and non-freezing as 0. Load the temperature data and fit this model. The format of the data file is a little awkward, as the even rows are the number of stations (which should be ignored) and have uneven number of space delimiters. The first 13 columns are the year and the monthly means; the final column is the annual average (which we don't want to use). In Julia, you can load the file with
+
+```{julia}
+temp_dat = CSV.read("data/HadCRUT5.1Analysis_gl.txt", delim=" ", ignorerepeated=true, header=false, DataFrame) # load data into DataFrame
+```
+
+To simplify the analysis, since we don't always know whether the lake froze in the January starting a year or the December ending a year, let's assume that the years in which the lake froze correspond to the winter starting the year (so the DJF mean corresponding to the freezing in 1884 would include the December from 1883 and the January and February from 1884). You will only be able to use freezing events between 1851 and the present day due to the temperature data. Interpret the coefficients from your model fit **in this specific problem context**.
 
 #### Problem 2.2
 
-Plot the median probability of freezing versus the DFJ temperature anomaly. Add the 90% prediction interval and the historical freezing events to the plot. Does this model seem reasonable? How over or under confident is it? Quantify this using the surprise index, or the difference between the fraction of events which are outside the 90% prediction interval and the expected 90% coverage.
+Plot the modeled probability of freezing as a function of the DFJ temperature anomaly, and how this probability has changed over time. Does this model seem reasonable? How might you determine this?
 
 #### Problem 2.3
 
-What winter temperature anomaly would be required for a 10% probability of Cayuga Lake freezing? 5%? 
+What winter temperature anomaly would be required for less than a 1% probability of Cayuga Lake freezing?
 
 ### Problem 3 (6 points)
 
@@ -168,11 +175,11 @@ One might interpret the hypothesis to claim that the impact of the name is stren
 
 #### Problem 4.2
 
-Interpret the results by generating 1,000 counterfactual simulations for hurricanes with male and female names. Plot the expected values and 90% prediction intervals from these two sets of simulations and compare with the observed storm deaths. Where does the model do well or not well? 
+Interpret the results by generating 10,000 counterfactual simulations for hurricanes with male and female names. Plot the expected values and 90% prediction intervals from these two sets of simulations and compare with the observed storm deaths. Where does the model do well or not well? 
 
 #### Problem 4.3
 
-If we take this hypothesis and model seriously, how many lives would have been saved over the data period by naming all of the hurricanes with male names? Does the effect size seem reasonable to you? Draw on qualitative or quantitative assessments to justify your assessment of reasonableness.
+Does the gender effect size resulting from this model seem reasonable to you? Draw on qualitative or quantitative assessments to justify your assessment of reasonableness.
 
 #### Problem 4.4
 
