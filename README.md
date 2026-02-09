@@ -36,12 +36,11 @@ The repository consists of the following files:
 
 These are provided in the project environment assuming the assignment will be solved in Julia; similar packages from other languages can be used instead.
 
-1. Random.jl: random number generation and seed-setting
-2. DataFrames.jl: tabular data structure
-3. CSV.jl: reads/writes .csv files
-4. Distributions.jl: interface to work with probability distributions
-5. Plots.jl: plotting library
-6. StatsBase.jl: statistical quantities like mean, median, etc
-7. StatsPlots.jl: some additional statistical plotting tools
-8. Optim.jl: optimization tools
-9. LaTeXStrings.jl: latex formatting for plot strings
+1. DataFrames.jl: tabular data structure
+2. CSV.jl: reads/writes .csv files
+3. Distributions.jl: interface to work with probability distributions
+4. Plots.jl: plotting library
+5. StatsBase.jl: statistical quantities like mean, median, etc
+6. StatsPlots.jl: some additional statistical plotting tools
+7. Optim.jl: optimization tools
+8. LaTeXStrings.jl: latex formatting for plot strings
