@@ -127,10 +127,12 @@ This problem is adapted from Example 4.1 and 4.2 in Daniel Wilks' *Statistical M
 
 #### Problem 2.1
 
-Write down a logistic regression model for the probability that Cayuga Lake freezes in a given winter. Encode the occurrence of freezing as a 1, and non-freezing as 0. Load the temperature data and fit this model. The format of the data file is a little awkward, as the even rows are the number of stations (which should be ignored) and have uneven number of space delimiters. The first 13 columns are the year and the monthly means; the final column is the annual average (which we don't want to use). In Julia, you can load the file with
+Write down a logistic regression model for the probability that Cayuga Lake freezes in a given winter. Encode the occurrence of freezing as a 1, and non-freezing as 0. Load the temperature data and fit this model. The format of the data file is a little awkward, as the even rows are the number of stations (which should be ignored) and have uneven number of space delimiters. The first 13 columns are the year and the monthly means; the final column is the annual average (which we don't want to use). Another complication is that the (even-numbered) station rows don't have an entry in the 14th column. In Julia, you can load the file with
 
-```{julia}
-temp_dat = CSV.read("data/HadCRUT5.1Analysis_gl.txt", delim=" ", ignorerepeated=true, header=false, DataFrame) # load data into DataFrame
+```julia
+temp_dat = CSV.read("data/HadCRUT5.1Analysis_gl.txt", delim=" ", 
+    ignorerepeated=true, header=false, 
+    silencewarnings=true, DataFrame) 
 ```
 
 To simplify the analysis, since we don't always know whether the lake froze in the January starting a year or the December ending a year, let's assume that the years in which the lake froze correspond to the winter starting the year (so the DJF mean corresponding to the freezing in 1884 would include the December from 1883 and the January and February from 1884). You will only be able to use freezing events between 1851 and the present day due to the temperature data. Interpret the coefficients from your model fit **in this specific problem context**.
